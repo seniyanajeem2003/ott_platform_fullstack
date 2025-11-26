@@ -1,0 +1,42 @@
+.dark-input {
+  background: #121212 !important;
+  color: #ffffff !important;
+  border: 1px solid #333 !important;
+  border-radius: 10px !important;
+  padding: 10px 12px !important;
+  transition: 0.3s ease;
+}
+
+.dark-input:focus {
+  border-color: #4f7cff !important;
+  box-shadow: 0 0 10px rgba(79, 124, 255, 0.5);
+}
+
+.btn-primary:hover {
+  background: #355de6 !important;
+  transform: translateY(-2px);
+  box-shadow: 0px 5px 15px rgba(79, 124, 255, 0.4);
+}
+
+.btn-outline-danger:hover {
+  background: rgba(255, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.offcanvas .nav-link:hover,
+.offcanvas .dropdown-item:hover {
+    background-color: #7b4dff !important; /* purple shade */
+    color: rgb(37, 4, 4) !important;
+}
+
+/* Active & focus states */
+.offcanvas .nav-link:focus,
+.offcanvas .dropdown-item:focus {
+    background-color: #5a33cc !important;
+    color: white !important;
+}
