@@ -3,3 +3,8 @@ djangofrontend/ott_movies/media/movie_videos/
 djangofrontend/ott_movies/media/videos/ 
 project1/ott_movies/media/movie_videos/ 
 project1/ott_movies/media/videos/ 
+*.mp4 
+djangofrontend/ott_movies/media/movie_videos/ 
+djangofrontend/ott_movies/media/videos/ 
+project1/ott_movies/media/movie_videos/ 
+project1/ott_movies/media/videos/ 
