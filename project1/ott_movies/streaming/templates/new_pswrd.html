@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Change Password</title>
+
+<style>
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+body { 
+    background: linear-gradient(135deg, #f3e8ff, #d6bcfa); 
+    min-height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+}
+
+nav {
+    background: linear-gradient(135deg, #7b5cf6, #6d28d9);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-radius: 0 0 12px 12px;
+}
+nav h2 { font-weight: 600; font-size: 22px; }
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    background-color: rgba(255,255,255,0.15);
+    padding: 8px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+nav a:hover { 
+    background-color: rgba(255,255,255,0.3); 
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.card {
+    background: white;
+    padding: 40px 50px;
+    border-radius: 20px;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    width: 380px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 28px rgba(0,0,0,0.2);
+}
+
+h1 { color: #4c1d95; margin-bottom: 25px; }
+
+label {
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #5b21b6;
+}
+
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #c4b5fd;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+input[type="password"]:focus {
+    border-color: #7b5cf6;
+    box-shadow: 0 0 8px rgba(123,92,246,0.4);
+    outline: none;
+}
+
+input[type="submit"] {
+    background: #7b5cf6;
+    color: white;
+    border: none;
+    padding: 12px 0;
+    width: 100%;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+input[type="submit"]:hover {
+    background: #6d28d9;
+    transform: translateY(-2px);
+}
+
+
+.message { margin-top: 15px; font-size: 14px; }
+.message.success { color: #16a34a; }
+.message.error { color: #dc2626; }
+
+</style>
+</head>
+
+<body>
+<nav>
+    <h2>OTT Admin</h2>
+    <a href="{% url 'home' %}">← Back to Home</a>
+</nav>
+
+<div class="container">
+    <div class="card">
+        <h1>Change Password</h1>
+        <form action="{% url 'new_pswrd' %}" method="POST">
+            {% csrf_token %}
+            <label>Old Password</label>
+            <input type="password" name="old" placeholder="Enter old password" required>
+
+            <label>New Password</label>
+            <input type="password" name="new" placeholder="Enter new password" required>
+
+            <input type="submit" value="Change Password">
+        </form>
+
+        {% if messages %}
+            <div class="message">
+                {% for message in messages %}
+                    <p class="{% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                        {{ message }}
+                    </p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

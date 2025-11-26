@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ movie.title }} - View Movie</title>
+
+<style>
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f5f0ff, #e0d7ff);
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    background: linear-gradient(135deg, #7b5cf6, #6d28d9);
+    color: white;
+    padding: 15px 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 0 0 12px 12px;
+}
+.navbar h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+}
+.back-btn {
+    background-color: rgba(255,255,255,0.2);
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+.back-btn:hover {
+    background-color: rgba(255,255,255,0.35);
+}
+
+.container {
+    max-width: 850px;
+    margin: 40px auto;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+    padding: 30px 40px;
+    text-align: center;
+}
+
+.movie-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #6d28d9;
+    margin-bottom: 12px;
+}
+.movie-description {
+    font-size: 16px;
+    color: #4b5563;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+video {
+    width: 100%;
+    max-height: 480px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+video:hover {
+    transform: scale(1.02);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+}
+
+.no-video {
+    color: #9f7aea;
+    font-weight: 500;
+    font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <h2>Movie Details</h2>
+    <a href="{% url 'home' %}" class="back-btn">← Back</a>
+</div>
+
+<div class="container">
+    <div class="movie-title">{{ movie.title }}</div>
+    <div class="movie-description">{{ movie.description }}</div>
+
+    {% if movie.video_file %}
+        <video controls>
+            <source src="{{ movie.video_file.url }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    {% else %}
+        <p class="no-video">No video uploaded for this movie.</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

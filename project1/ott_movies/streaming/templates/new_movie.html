@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{% if movie %}Edit Movie{% else %}Add New Movie{% endif %} | OTT Admin</title>
+<style>
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f0f2f5;
+    margin: 0;
+    padding: 0;
+    color: #111827;
+}
+
+nav {
+    background: #6D28D9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+nav h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: white;
+}
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #D946EF, #9333EA);
+    transition: 0.3s;
+}
+nav a:hover {
+    background: linear-gradient(135deg, #9333EA, #D946EF);
+}
+
+.container {
+    max-width: 600px;
+    background: white;
+    margin: 50px auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
+}
+
+label {
+    font-weight: 500;
+    margin-top: 15px;
+    display: block;
+    color: #444;
+}
+
+
+input[type="text"],
+textarea,
+input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
+}
+input[type="text"]:focus,
+textarea:focus,
+input[type="file"]:focus {
+    border-color: #6D28D9;
+    box-shadow: 0 0 5px rgba(109, 40, 217, 0.4);
+}
+
+
+input[type="submit"] {
+    background: linear-gradient(135deg, #D946EF, #9333EA);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    width: 100%;
+    transition: 0.3s;
+}
+input[type="submit"]:hover {
+    background: linear-gradient(135deg, #9333EA, #D946EF);
+}
+
+
+.cancel-btn {
+    display: inline-block;
+    text-align: center;
+    background-color: #EF4444;
+    color: white;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: 0.3s;
+}
+.cancel-btn:hover {
+    background-color: #B91C1C;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+.form-buttons input[type="submit"], 
+.form-buttons .cancel-btn {
+    flex: 1; 
+}
+
+
+.preview-img {
+    margin-top: 10px;
+    width: 150px;
+    border-radius: 8px;
+}
+</style>
+</head>
+<body>
+
+<nav>
+    <h2>OTT Admin</h2>
+    <div><a href="{% url 'home' %}">Home</a></div>
+</nav>
+
+<div class="container">
+    <h1>{% if movie %}Edit Movie{% else %}Add New Movie{% endif %}</h1>
+
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label>Movie Name</label>
+        <input type="text" name="name"
+               value="{{ movie.title }}"
+               placeholder="Enter movie name" required>
+
+        <label>Description</label>
+        <textarea name="desptn" rows="4" required>{{ movie.description }}</textarea>
+
+        <label>Thumbnail Image</label>
+        <input type="file" name="image" accept="image/*">
+        {% if movie.image %}
+            <img src="{{ movie.image.url }}" class="preview-img">
+        {% endif %}
+
+        <label>Upload Movie File</label>
+        <input type="file" name="video_file" accept="video/*">
+        {% if movie.video_file %}
+            <p>Current file: {{ movie.video_file.name }}</p>
+        {% endif %}
+
+        <div class="form-buttons">
+            <input type="submit" value="{% if movie %}Update Movie{% else %}Add Movie{% endif %}">
+            <a href="{% url 'home' %}" class="cancel-btn">Cancel</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

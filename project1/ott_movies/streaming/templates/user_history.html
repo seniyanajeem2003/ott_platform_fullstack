@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User History</title>
+
+<style>
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+body { background-color: #f0f2f8; }
+
+nav {
+    background: linear-gradient(135deg, #6B46C1, #38B2AC);
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+nav .logo { font-size: 22px; font-weight: 600; }
+nav ul { list-style: none; display: flex; gap: 15px; }
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.1);
+    transition: 0.3s;
+}
+nav ul li a:hover { background: rgba(255,255,255,0.25); }
+
+.container {
+    width: 90%;
+    margin: 40px auto;
+    background-color: white;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #2D3748;
+    font-size: 1.8rem;
+}
+
+.search-container { display: flex; justify-content: center; margin-bottom: 25px; }
+.search-input {
+    width: 250px;
+    padding: 10px 18px;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+.search-input:focus {
+    width: 330px;
+    border-color: #38B2AC;
+    box-shadow: 0 0 8px rgba(56,178,172,0.4);
+}
+
+table { width: 100%; border-collapse: collapse; text-align: center; }
+th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+th { background-color: #6B46C1; color: white; font-weight: 500; }
+tr:hover { background-color: #edf2f7; }
+
+.pagination { text-align: center; margin-top: 25px; }
+.pagination a {
+    padding: 8px 15px;
+    margin: 0 5px;
+    background-color: #6B46C1;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+}
+.pagination a:hover { background-color: #553c9a; }
+.pagination span { font-size: 14px; color: #2D3748; }
+
+</style>
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">User History</div>
+    <ul>
+        <li><a href="{% url 'data' %}">Back to User Data</a></li>
+    </ul>
+</nav>
+
+<div class="container">
+    <h2>Watch History of {{ user.name }}</h2>
+
+    <div class="search-container">
+        <input 
+            class="search-input" 
+            type="text" 
+            id="liveSearch" 
+            placeholder="Search movie name..." 
+            value="{{ request.GET.q }}"
+        >
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Sl. No.</th>
+                <th>Movie Name</th>
+                <th>Watched On</th>
+            </tr>
+        </thead>
+        <tbody id="historyTable">
+            {% for item in page_obj %}
+            <tr>
+                <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+                <td>{{ item.movie.title }}</td>
+                <td>{{ item.watched_on|date:"d M Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">No movies found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div id="paginationBox" class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">⟨ Prev</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Next ⟩</a>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+const input = document.getElementById("liveSearch");
+const table = document.getElementById("historyTable");
+const pagination = document.getElementById("paginationBox");
+let debounceTimer;
+
+input.addEventListener("keyup", function() {
+    clearTimeout(debounceTimer);
+    const q = this.value.trim();
+    debounceTimer = setTimeout(() => searchHistory(q), 300);
+});
+
+function searchHistory(q) {
+    if (!q) { location.reload(); return; }
+
+    fetch(`/search_user_history/?user_id={{ user.id }}&q=${encodeURIComponent(q)}`)
+        .then(res => res.json())
+        .then(data => {
+            table.innerHTML = "";
+            pagination.style.display = "none";
+
+            if (data.results.length === 0) {
+                table.innerHTML = `<tr><td colspan="3">No movies found.</td></tr>`;
+                return;
+            }
+
+            data.results.forEach((item, index) => {
+                table.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${item.movie_title}</td>
+                    <td>${item.watched_on}</td>
+                </tr>`;
+            });
+        })
+        .catch(err => console.error("Search failed:", err));
+}
+</script>
+
+</body>
+</html>

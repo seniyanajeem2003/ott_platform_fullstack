@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Movie Views</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+body { background-color: #f0f2f8; }
+
+nav {
+    background: linear-gradient(135deg, #6B46C1, #38B2AC);
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+nav .logo { font-size: 22px; font-weight: 600; }
+nav ul { list-style: none; display: flex; gap: 15px; }
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.1);
+    transition: 0.3s;
+}
+nav ul li a:hover { background: rgba(255,255,255,0.25); }
+
+.container {
+    width: 90%;
+    margin: 40px auto;
+    background-color: white;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #2D3748;
+    font-size: 1.8rem;
+}
+
+.search-container { display: flex; justify-content: center; margin-bottom: 25px; }
+.search-input {
+    width: 250px;
+    padding: 10px 18px;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+.search-input:focus {
+    width: 330px;
+    border-color: #38B2AC;
+    box-shadow: 0 0 8px rgba(56,178,172,0.4);
+}
+
+table { width: 100%; border-collapse: collapse; text-align: center; }
+th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+th { background-color: #6B46C1; color: white; font-weight: 500; }
+tr:hover { background-color: #edf2f7; }
+
+.pagination { text-align: center; margin-top: 25px; }
+.pagination a {
+    padding: 8px 15px;
+    margin: 0 5px;
+    background-color: #6B46C1;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+}
+.pagination a:hover { background-color: #553c9a; }
+.pagination span { font-size: 14px; color: #2D3748; }
+</style>
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">Movie Views</div>
+    <ul>
+        <li><a href="{% url 'data' %}">Back to User Data</a></li>
+    </ul>
+</nav>
+
+<div class="container">
+    <h2>Movie Views</h2>
+
+    <div class="search-container">
+        <input type="text" id="liveMovieSearch" class="search-input" placeholder="Search by movie name..." value="{{ request.GET.q }}">
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Sl. No.</th>
+                <th>Movie Name</th>
+                <th>Views</th>
+            </tr>
+        </thead>
+        <tbody id="movieTable">
+            {% for movie in page_obj %}
+            <tr>
+                <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+                <td>{{ movie.title }}</td>
+                <td>{{ movie.views }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No movies found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagination" id="paginationBox">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">⟨ Prev</a>
+        {% endif %}
+
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Next ⟩</a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+const searchInput = document.getElementById("liveMovieSearch");
+const tableBody = document.getElementById("movieTable");
+const pagination = document.getElementById("paginationBox");
+
+searchInput.addEventListener("keyup", function() {
+    const q = this.value.trim();
+
+    if (q === "") {
+        location.reload();
+        return;
+    }
+
+    fetch(`/search_movies/?q=${encodeURIComponent(q)}`)
+        .then(res => res.json())
+        .then(data => {
+            tableBody.innerHTML = "";
+            pagination.style.display = "none";
+
+            if (data.movies.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="3">No movies found.</td></tr>`;
+                return;
+            }
+
+            data.movies.forEach((movie, index) => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${movie.title}</td>
+                        <td>${movie.views}</td>
+                    </tr>`;
+            });
+        })
+        .catch(err => console.error("Error fetching movies:", err));
+});
+</script>
+
+</body>
+</html>
