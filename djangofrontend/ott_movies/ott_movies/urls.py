@@ -1,19 +1,3 @@
-"""
-URL configuration for ott_movies project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.urls import path
 from streaming import views
 from django.conf import settings
@@ -39,10 +23,7 @@ urlpatterns = [
     path('search_user_history/', views.search_user_history, name='search_user_history'),
     path("logout", views.admin_logout, name='admin_logout'),
 
-
-
-# User api urls
-
+    # User API URLs
     path('api/login', views.login_api, name='login_page'),
     path('api/movies', views.movies, name='movies'),
     path("api/get_movie/<int:movie_id>/", views.get_movie),
@@ -53,13 +34,9 @@ urlpatterns = [
     path('api/watchlater/remove', views.remove_watch_later),
     path('api/watchhistory/add', views.add_watch_history),
     path('api/watchhistory/list', views.get_user_history),
+    path("api/comments/<int:movie_id>/", views.get_comments),
+    path("api/comments/add", views.add_comment),
     path('api/logout', views.logout_api),
-
-    #userapi
     path('api/signup', views.Signup, name='signup'),
 
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-
-
-
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

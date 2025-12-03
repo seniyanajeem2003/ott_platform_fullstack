@@ -8,10 +8,11 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate,login
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND, HTTP_200_OK
-from .serializers import (MovieSerializer,WatchLaterSerializer,WatchHistorySerializer)
+from .serializers import (MovieSerializer,WatchLaterSerializer,WatchHistorySerializer, MovieCommentSerializer)
 from .models import Movies
 from .models import WatchLater
 from .models import WatchHistory
+from .models import MovieComment
 from rest_framework import status  
 from rest_framework.permissions import IsAuthenticated 
 from django.contrib import messages
@@ -25,6 +26,8 @@ from django.db.models import Q
 from django.db.models import Count
 from django.contrib.auth import logout
 from django.contrib import messages
+
+
 
 
 
@@ -50,20 +53,22 @@ def admin_login(request):
 @login_required
 def home(request):
     query = request.GET.get("q", "")
-
+    
+    movies = Movies.objects.all()
+    
     if query:
-        movies = Movies.objects.filter(title__icontains=query)
-    else:
-        movies = Movies.objects.all()
-
-    paginator = Paginator(movies, 5) 
+        movies = movies.filter(title__icontains=query)
+   
+    paginator = Paginator(movies, 5)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    
     return render(request, "home.html", {
         "page_obj": page_obj,
         "query": query,
     })
+
 
 
 
@@ -122,6 +127,7 @@ def search_user_history(request):
 @login_required
 def new_movie(request, id=None):
     movie = None
+
     if id:
         movie = get_object_or_404(Movies, id=id)
 
@@ -130,10 +136,11 @@ def new_movie(request, id=None):
         desptn = request.POST.get("desptn")
         image = request.FILES.get("image")
         video_file = request.FILES.get("video_file")
-
+        
         if movie:  
             movie.title = name
             movie.description = desptn
+           
 
             if image:
                 movie.image = image
@@ -144,14 +151,18 @@ def new_movie(request, id=None):
             return redirect("home")
 
         else:    
-            Movies.objects.create(
+            movie = Movies.objects.create(
                 title=name,
                 description=desptn,
                 image=image,
-                video_file=video_file
+                video_file=video_file,
             )
             return redirect("home")
-    return render(request, 'new_movie.html', {'movie': movie})
+
+    return render(request, 'new_movie.html', {
+        'movie': movie,
+    })
+
 
 
 @login_required
@@ -255,6 +266,7 @@ def new_pswrd(request):
         return redirect("login")
 
     return render(request, "new_pswrd.html")
+
 
 
 @login_required
@@ -451,6 +463,56 @@ def change_password(request):
     )
 
 
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_comment(request):
+    try:
+        movie_id = request.data.get("movie")
+        comment_text = request.data.get("comment")
+
+        print("Incoming Data:", request.data)  
+
+        if not movie_id or not comment_text:
+            return Response(
+                {"error": "Movie ID and comment are required"},
+                status=400
+            )
+
+        try:
+            movie = Movies.objects.get(id=movie_id)
+        except Movies.DoesNotExist:
+            return Response(
+                {"error": "Movie not found"},
+                status=404
+            )
+
+        comment = MovieComment.objects.create(
+            user=request.user,
+            movie=movie,
+            comment=comment_text
+        )
+
+        serializer = MovieCommentSerializer(comment)
+        return Response(serializer.data, status=201)
+
+    except Exception as e:
+        print("Comment Error:", str(e))
+        return Response(
+            {"error": "Server error"},
+            status=500
+        )
+
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_comments(request, movie_id):
+    comments = MovieComment.objects.filter(movie_id=movie_id).order_by("-created_at")
+    serializer = MovieCommentSerializer(comments, many=True)
+    return Response(serializer.data)
+
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_api(request):
@@ -478,3 +540,4 @@ def Signup(request):
         user.name = name
         user.save()
         return JsonResponse({'message':'user created successsfully'} ,status = 200)
+         

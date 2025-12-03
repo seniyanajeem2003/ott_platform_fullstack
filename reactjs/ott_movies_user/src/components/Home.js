@@ -16,6 +16,7 @@ function MoviesPage() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
 
+  
   useEffect(() => {
     axios
       .get("http://127.0.0.1:8000/api/movies")
@@ -39,12 +40,8 @@ function MoviesPage() {
       })
       .then((res) => {
         const user = res.data;
-
         const finalName =
-          user.name?.trim() ||          
-          user.email?.split("@")[0] ||  
-          "User";                      
-
+          user.name?.trim() || user.email?.split("@")[0] || "User";
         setUsername(finalName);
       })
       .catch(() => setUsername("User"));
@@ -66,7 +63,6 @@ function MoviesPage() {
 
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
-
     if (!token) return navigate("/login");
 
     await axios.post(
@@ -146,12 +142,7 @@ function MoviesPage() {
       />
 
       <div className="d-md-none p-3">
-        <div
-          className="dropdown w-100"
-          style={{
-            textAlign: "center",
-          }}
-        >
+        <div className="dropdown w-100 text-center">
           <button
             className="btn w-100"
             style={{
@@ -165,7 +156,6 @@ function MoviesPage() {
           >
             ☰ Menu
           </button>
-
           <ul
             className="dropdown-menu w-100 mt-2 mobile-dropdown shadow"
             style={{
@@ -179,7 +169,6 @@ function MoviesPage() {
                 Watch Later
               </a>
             </li>
-
             <li>
               <a className="dropdown-item text-light" href="/watchhistory">
                 Watch History
@@ -188,7 +177,6 @@ function MoviesPage() {
           </ul>
         </div>
       </div>
-
 
       <div className="d-flex">
         <div className="flex-grow-1 p-4">
@@ -211,7 +199,7 @@ function MoviesPage() {
                   <Card
                     title={movie.title}
                     description={movie.description}
-                    image={`http://127.0.0.1:8000${movie.image}`}
+                    image={movie.image ? `http://127.0.0.1:8000${movie.image}` : ""}
                     link={`/watch/${movie.id}`}
                   >
                     <button
@@ -233,6 +221,7 @@ function MoviesPage() {
           />
         </div>
 
+        {/* Sidebar */}
         <div
           className="d-none d-md-block p-4 shadow-lg"
           style={{
@@ -244,12 +233,20 @@ function MoviesPage() {
           <h5 className="fw-bold text-info">Lists</h5>
           <ul className="nav flex-column mt-3">
             <li className="nav-item mb-3">
-              <a className="nav-link text-light" href="/watchlist" style={{whiteSpace: "nowrap"}}>
+              <a
+                className="nav-link text-light"
+                href="/watchlist"
+                style={{ whiteSpace: "nowrap" }}
+              >
                 ➤ Watch Later
               </a>
             </li>
             <li className="nav-item mb-3">
-              <a className="nav-link text-light" href="/watchhistory" style={{whiteSpace: "nowrap"}}>
+              <a
+                className="nav-link text-light"
+                href="/watchhistory"
+                style={{ whiteSpace: "nowrap" }}
+              >
                 ➤ Watch History
               </a>
             </li>
@@ -264,14 +261,9 @@ function MoviesPage() {
         }
       `}</style>
 
+      {/* Logout modal */}
       {showLogoutModal && (
-        <div
-          className="modal fade show"
-          style={{
-            display: "block",
-            background: "rgba(0,0,0,0.7)"
-          }}
-        >
+        <div className="modal fade show" style={{ display: "block", background: "rgba(0,0,0,0.7)" }}>
           <div className="modal-dialog modal-dialog-centered">
             <div
               className="modal-content"
@@ -289,18 +281,18 @@ function MoviesPage() {
                   onClick={() => setShowLogoutModal(false)}
                 ></button>
               </div>
-
               <div className="modal-body">Are you sure?</div>
-
               <div className="modal-footer border-0">
-                <button className="btn btn-secondary" onClick={() => setShowLogoutModal(false)}>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setShowLogoutModal(false)}
+                >
                   Cancel
                 </button>
                 <button className="btn btn-danger" onClick={handleLogout}>
                   Logout
                 </button>
               </div>
-
             </div>
           </div>
         </div>
